@@ -3,6 +3,9 @@ const cors = require('cors')
 require('dotenv').config()
 
 const authRoutes = require('./routes/authRoutes')
+const onboardingRoutes = require('./routes/onboardingRoutes')
+const curriculumRoutes = require('./routes/curriculumRoutes')
+const questionsRoutes = require('./routes/questionsRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -19,6 +22,9 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/onboarding', onboardingRoutes)
+app.use('/api/curriculum', curriculumRoutes)
+app.use('/api/questions', questionsRoutes)
 
 app.listen(PORT, () => {
   console.log(`FORGE backend running on port ${PORT}`)
