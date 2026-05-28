@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                        String    @id @default(cuid())
+  name                      String
+  email                     String    @unique
+  password                  String
+  domain                    String?
+  currentDay                Int       @default(1)
+  phase                     Int       @default(1)
+  streakCount               Int       @default(0)
+  streakRecord              Int       @default(0)
+  lifeHappensPassUsed       Boolean   @default(false)
+  lifeHappensPassResetDate  DateTime?
+  studyWindowTime           String?
+  sessionMode               String    @default("full")
+  voicePreference           String    @default("warm")
+  goal                      String?
+  experienceLevel           String?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  sessions                  Session[]
+  notifications             Notification[]
+  certificates              Certificate[]
+}
+
+model Session {
+  id              String    @id @default(cuid())
+  userId          String
+  dayNumber       Int
+  topic           String
+  completedAt     DateTime?
+  duration        Int?
+  modeUsed        String    @default("full")
+  confidenceScore Int?
+  createdAt       DateTime  @default(now())
+
+  user            User      @relation(fields: [userId], references: [id])
+  questions       Question[]
+}
+
+model Question {
+  id                  String   @id @default(cuid())
+  sessionId           String
+  questionText        String
+  difficulty          String
+  learnerAnswer       String?
+  aiScore             Int?
+  conceptsUnderstood  String?
+  conceptsMissed      String?
+  flagged             Boolean  @default(false)
+  createdAt           DateTime @default(now())
+
+  session             Session  @relation(fields: [sessionId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  sentAt    DateTime @default(now())
+  opened    Boolean  @default(false)
+  openedAt  DateTime?
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Certificate {
+  id                 String   @id @default(cuid())
+  userId             String
+  domain             String
+  issueDate          DateTime @default(now())
+  specificTopics     String
+  averageScore       Int?
+  questionsCompleted Int?
+
+  user               User     @relation(fields: [userId], references: [id])
+}
