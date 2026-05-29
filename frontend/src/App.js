@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
+import Session from './pages/Session'
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth()
@@ -25,6 +26,9 @@ function AppRoutes() {
       } />
       <Route path="/dashboard" element={
         <ProtectedRoute><Dashboard /></ProtectedRoute>
+      } />
+      <Route path="/session" element={
+        <ProtectedRoute><Session /></ProtectedRoute>
       } />
     </Routes>
   )

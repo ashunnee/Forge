@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes')
 const onboardingRoutes = require('./routes/onboardingRoutes')
 const curriculumRoutes = require('./routes/curriculumRoutes')
 const questionsRoutes = require('./routes/questionsRoutes')
+const sessionRoutes = require('./routes/sessionRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -25,6 +26,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/onboarding', onboardingRoutes)
 app.use('/api/curriculum', curriculumRoutes)
 app.use('/api/questions', questionsRoutes)
+app.use('/api/session', sessionRoutes)
 
 app.listen(PORT, () => {
   console.log(`FORGE backend running on port ${PORT}`)
