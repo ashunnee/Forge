@@ -1,36 +1,36 @@
-const Anthropic = require('@anthropic-ai/sdk')
+const Groq = require('groq-sdk')
 require('dotenv').config()
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
+const client = new Groq({
+  apiKey: process.env.GROQ_API_KEY
 })
 
 const generateQuestions = async (topic, dayNumber, domain, phase) => {
   try {
-    const difficultyGuide = phase === 1 
-      ? 'easy questions only' 
-      : phase === 2 
+    const difficultyGuide = phase === 1
+      ? 'easy questions only'
+      : phase === 2
       ? 'easy and medium questions'
       : phase === 3
       ? 'medium and hard questions'
       : 'all difficulty levels including timed interview style'
 
-    const message = await client.messages.create({
-      model: 'claude-opus-4-6',
+    const completion = await client.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
       max_tokens: 1000,
       messages: [
         {
           role: 'user',
           content: `You are a senior technical interviewer generating practice questions for a learner on Day ${dayNumber} of their ${domain} learning track. Today's topic is: "${topic}". Generate ${difficultyGuide}.
 
-Return ONLY this exact JSON format, nothing else:
+Return ONLY this exact JSON format, nothing else, no extra text:
 {
   "easy": {
     "question": "question text here",
     "hint": "hint if they get stuck"
   },
   "medium": {
-    "question": "question text here", 
+    "question": "question text here",
     "hint": "hint if they get stuck"
   },
   "hard": {
@@ -49,7 +49,7 @@ Rules:
       ]
     })
 
-    const content = message.content[0].text
+    const content = completion.choices[0].message.content
     const cleaned = content.replace(/```json|```/g, '').trim()
     const questions = JSON.parse(cleaned)
 
@@ -57,17 +57,17 @@ Rules:
 
   } catch (error) {
     console.error('AI question generation error:', error)
-    return { 
-      success: false, 
-      error: 'Could not generate questions right now.' 
+    return {
+      success: false,
+      error: 'Could not generate questions right now.'
     }
   }
 }
 
 const evaluateAnswer = async (question, answer, topic, domain) => {
   try {
-    const message = await client.messages.create({
-      model: 'claude-opus-4-6',
+    const completion = await client.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
       max_tokens: 1000,
       messages: [
         {
@@ -78,20 +78,20 @@ Topic: ${topic}
 Question: ${question}
 Their answer: ${answer}
 
-Return ONLY this exact JSON format, nothing else:
+Return ONLY this exact JSON format, nothing else, no extra text:
 {
   "score": 0-100,
-  "understood": ["concept they got right", "another concept"],
-  "missed": ["concept they missed", "another gap"],
-  "feedback": "2-3 sentences of specific feedback about their exact answer. Conversational, not generic. Like a mentor talking.",
-  "followUp": "One natural follow-up question based on what they said, like a real interviewer would ask.",
-  "encouragement": "One sentence specific to their progress. Human and genuine, not generic."
+  "understood": ["concept they got right"],
+  "missed": ["concept they missed"],
+  "feedback": "2-3 sentences of specific feedback. Conversational, like a mentor talking.",
+  "followUp": "One natural follow-up question like a real interviewer would ask.",
+  "encouragement": "One sentence, genuine and specific."
 }`
         }
       ]
     })
 
-    const content = message.content[0].text
+    const content = completion.choices[0].message.content
     const cleaned = content.replace(/```json|```/g, '').trim()
     const evaluation = JSON.parse(cleaned)
 
@@ -99,17 +99,17 @@ Return ONLY this exact JSON format, nothing else:
 
   } catch (error) {
     console.error('AI evaluation error:', error)
-    return { 
-      success: false, 
-      error: 'Could not evaluate answer right now.' 
+    return {
+      success: false,
+      error: 'Could not evaluate answer right now.'
     }
   }
 }
 
 const generateSessionOpening = async (name, dayNumber, topic, streakCount, voicePreference) => {
   try {
-    const message = await client.messages.create({
-      model: 'claude-opus-4-6',
+    const completion = await client.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
       max_tokens: 200,
       messages: [
         {
@@ -119,24 +119,24 @@ const generateSessionOpening = async (name, dayNumber, topic, streakCount, voice
 Rules:
 - Under 40 words
 - Reference something specific about today's topic
-- No generic motivation platitudes  
+- No generic motivation platitudes
 - End with energy
-- Match voice: warm=encouraging mentor, direct=no fluff straight talk, formal=professional
+- Match voice: warm=encouraging mentor, direct=no fluff, formal=professional
 - Return only the message, nothing else`
         }
       ]
     })
 
-    return { 
-      success: true, 
-      message: message.content[0].text 
+    return {
+      success: true,
+      message: completion.choices[0].message.content
     }
 
   } catch (error) {
     console.error('Session opening error:', error)
-    return { 
-      success: true, 
-      message: `Day ${dayNumber}. ${topic}. Let us get into it.` 
+    return {
+      success: true,
+      message: `Day ${dayNumber}. ${topic}. Let us get into it.`
     }
   }
 }

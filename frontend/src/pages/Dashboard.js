@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { getTodayLesson, getFullCurriculum } from '../services/api'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
@@ -10,8 +11,17 @@ export default function Dashboard() {
   const [lesson, setLesson] = useState(null)
   const [curriculum, setCurriculum] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [notifications, setNotifications] = useState([])
+  const [showNotifications, setShowNotifications] = useState(false)
 
   useEffect(() => {
+    const token = localStorage.getItem('forge_token')
+    axios.get('http://localhost:5000/api/notifications', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => setNotifications(res.data.notifications))
+      .catch(console.error)
+
     Promise.all([getTodayLesson(), getFullCurriculum()])
       .then(([lessonRes, currRes]) => {
         setLesson(lessonRes.data)
@@ -34,6 +44,11 @@ export default function Dashboard() {
       <div style={styles.header}>
         <div style={styles.logo}>FORGE</div>
         <div style={styles.headerRight}>
+          <button style={styles.bellBtn} onClick={() => setShowNotifications(!showNotifications)}>
+            🔔 {notifications.length > 0 && (
+              <span style={styles.bellBadge}>{notifications.length}</span>
+            )}
+          </button>
           <div style={styles.streak}>
             🔥 {user?.streakCount || 0} day streak
           </div>
@@ -42,6 +57,17 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {showNotifications && notifications.length > 0 && (
+        <div style={styles.notifDropdown}>
+          {notifications.map(n => (
+            <div key={n.id || n.sentAt} style={styles.notifItem}>
+              <div style={styles.notifMessage}>{n.message}</div>
+              <div style={styles.notifTime}>{new Date(n.sentAt).toLocaleDateString()}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={styles.content}>
 
@@ -400,5 +426,57 @@ const styles = {
     color: '#888888',
     textTransform: 'uppercase',
     letterSpacing: '1px'
+  },
+  bellBtn: {
+    position: 'relative',
+    background: '#1A1A1A',
+    border: '1px solid #222222',
+    borderRadius: '100px',
+    padding: '8px 16px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    color: '#F5F5F5'
+  },
+  bellBadge: {
+    position: 'absolute',
+    top: '-4px',
+    right: '-4px',
+    background: '#FF4D00',
+    color: '#fff',
+    borderRadius: '50%',
+    width: '18px',
+    height: '18px',
+    fontSize: '11px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '700'
+  },
+  notifDropdown: {
+    position: 'absolute',
+    top: '70px',
+    right: '40px',
+    background: '#111111',
+    border: '1px solid #222222',
+    borderRadius: '16px',
+    padding: '16px',
+    width: '360px',
+    zIndex: 100,
+    maxHeight: '400px',
+    overflowY: 'auto'
+  },
+  notifItem: {
+    padding: '12px',
+    borderBottom: '1px solid #1A1A1A',
+    marginBottom: '8px'
+  },
+  notifMessage: {
+    fontSize: '14px',
+    lineHeight: '1.5',
+    marginBottom: '4px'
+  },
+  notifTime: {
+    fontSize: '12px',
+    color: '#888888'
   }
 }
