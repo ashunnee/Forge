@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
+ "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "build": "npx prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -17,6 +18,7 @@
     "@libsql/client": "^0.17.3",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/adapter-libsql": "^7.8.0",
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.10.0",
@@ -28,6 +30,7 @@
     "groq-sdk": "^1.2.1",
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.21.0",
     "prisma": "^7.8.0"
   },
   "devDependencies": {

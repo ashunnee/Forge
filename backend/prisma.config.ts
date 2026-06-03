@@ -5,6 +5,6 @@ export default defineConfig({
   earlyAccess: true,
   schema: path.join('prisma', 'schema.prisma'),
   datasource: {
-    url: 'file:C:/Users/HP/Desktop/Forge/forge-app/backend/prisma/forge.db'
+    url: 'postgresql://postgres:ialwaysforgetmypassword@db.bjxezdpwmjdsfnbesmxy.supabase.co:5432/postgres'
   }
 })

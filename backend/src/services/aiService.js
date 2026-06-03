@@ -1,9 +1,16 @@
-const Groq = require('groq-sdk')
 require('dotenv').config()
+const Groq = require('groq-sdk')
 
-const client = new Groq({
-  apiKey: process.env.GROQ_API_KEY
-})
+let client = null
+
+const getClient = () => {
+  if (!client) {
+    client = new Groq({
+      apiKey: process.env.GROQ_API_KEY
+    })
+  }
+  return client
+}
 
 const generateQuestions = async (topic, dayNumber, domain, phase) => {
   try {
@@ -15,7 +22,7 @@ const generateQuestions = async (topic, dayNumber, domain, phase) => {
       ? 'medium and hard questions'
       : 'all difficulty levels including timed interview style'
 
-    const completion = await client.chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 1000,
       messages: [
@@ -66,7 +73,7 @@ Rules:
 
 const evaluateAnswer = async (question, answer, topic, domain) => {
   try {
-    const completion = await client.chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 1000,
       messages: [
@@ -108,7 +115,7 @@ Return ONLY this exact JSON format, nothing else, no extra text:
 
 const generateSessionOpening = async (name, dayNumber, topic, streakCount, voicePreference) => {
   try {
-    const completion = await client.chat.completions.create({
+    const completion = await getClient().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 200,
       messages: [
