@@ -2,11 +2,12 @@ const { PrismaClient } = require('@prisma/client')
 const { PrismaPg } = require('@prisma/adapter-pg')
 const { Pool } = require('pg')
 
-const connectionString = process.env.DATABASE_URL
-
 const pool = new Pool({
-  connectionString,
-  ssl: { rejectUnauthorized: false }
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined
+  }
 })
 
 const adapter = new PrismaPg(pool)
