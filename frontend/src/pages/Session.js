@@ -121,16 +121,15 @@ export default function Session() {
 
               {/* Video Placeholder */}
               <div style={styles.videoPlaceholder}>
-                <div style={styles.videoInner}>
-                  <div style={styles.playIcon}>▶</div>
-                  <p style={styles.videoText}>
-                    Animated lesson video
-                  </p>
-                  <p style={styles.videoSubtext}>
-                    {lesson.lesson?.topic}
-                  </p>
-                </div>
-              </div>
+  <iframe
+    src="https://archive.org/embed/day-1-python"
+    width="100%"
+    height="100%"
+    frameBorder="0"
+    allowFullScreen
+    style={{ borderRadius: 16 }}
+  />
+</div>
 
               {/* Key Concepts */}
               <div style={styles.conceptsCard}>
